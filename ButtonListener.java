@@ -1,7 +1,7 @@
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class ButtonListener implements EventHandler<MouseEvent> {
+public class ButtonListener extends MouseAdapter {
     private final Board board;
     private final int x;
     private final int y;
@@ -13,14 +13,14 @@ public class ButtonListener implements EventHandler<MouseEvent> {
     }
 
     @Override
-    public void handle(MouseEvent event) {
+    public void mouseClicked(MouseEvent event) {
         if (board.selectedPiece == null) {
             // Select piece
             Piece piece = board.board[x][y];
             if (piece != null && piece.isPlayerOne == board.isPlayerOneTurn) {
                 board.selectedPiece = piece;
                 board.clearHighlights();
-                board.rectangles[x][y].setFill(Color.YELLOW); // Highlight selected piece
+                board.rectangles[x][y].setBackground(Color.YELLOW); // Highlight selected piece
             }
         } else {
             // Move piece or attack

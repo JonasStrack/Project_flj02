@@ -1,25 +1,23 @@
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
+import javax.swing.*;
+import java.awt.*;
 
-public class Main extends Application {
-    @Override
-    public void start(Stage primaryStage) {
+public class Main {
+    public static void main(String[] args) {
+        // Create the board and ranks panel
         Board board = new Board();
         RanksPanel ranksPanel = new RanksPanel();
 
-        BorderPane root = new BorderPane();
-        root.setCenter(board);
-        root.setRight(ranksPanel);
+        // Create the main frame (JFrame in Swing)
+        JFrame frame = new JFrame("Stratego Game");
 
-        Scene scene = new Scene(root, 1000, 800);
-        primaryStage.setTitle("Stratego Game");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+        // Create the layout using BorderLayout
+        frame.setLayout(new BorderLayout());
+        frame.add(board, BorderLayout.CENTER);
+        frame.add(ranksPanel, BorderLayout.EAST);
 
-    public static void main(String[] args) {
-        launch(args);
+        // Set the size of the window
+        frame.setSize(1000, 800);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close the application when the window is closed
+        frame.setVisible(true);  // Make the window visible
     }
 }

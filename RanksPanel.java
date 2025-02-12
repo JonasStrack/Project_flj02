@@ -1,11 +1,10 @@
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javax.swing.*;
+import java.awt.*;
 
-public class RanksPanel extends VBox {
+public class RanksPanel extends JPanel {
     public RanksPanel() {
-        setPrefSize(200, 800);
-        setSpacing(10);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));  // VBox equivalent
+        setPreferredSize(new Dimension(200, 800));  // Set preferred size
 
         String[] ranks = {
             "Flag (0)",
@@ -22,10 +21,13 @@ public class RanksPanel extends VBox {
             "Bomb (B)"
         };
 
+        // Loop through the ranks and create JLabel for each
         for (String rank : ranks) {
-            Text rankText = new Text(rank);
-            rankText.setFont(Font.font("Arial", 16));
-            getChildren().add(rankText);
+            JLabel rankLabel = new JLabel(rank);
+            rankLabel.setFont(new Font("Arial", Font.PLAIN, 16));  // Set font like in JavaFX
+            rankLabel.setAlignmentX(CENTER_ALIGNMENT);  // Center align text
+            add(rankLabel);
+            add(Box.createVerticalStrut(10));  // Add spacing between components
         }
     }
 }

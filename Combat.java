@@ -1,5 +1,5 @@
 public class Combat {
-    
+
     public static void resolveCombat(Board board, Piece attacker, Piece defender, int x, int y) {
         attacker.isRevealed = true;
         defender.isRevealed = true;
@@ -26,6 +26,7 @@ public class Combat {
             board.board[attacker.x][attacker.y] = null;
         }
 
-        board.refreshBoard();
+        // After combat, update the UI board to reflect changes
+        board.refreshBoard(); // You can also use repaint() if it's not updating automatically.
     }
 }

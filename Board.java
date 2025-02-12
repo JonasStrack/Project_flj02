@@ -1,11 +1,12 @@
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Board extends GridPane {
+public class Board extends JPanel {
     int size = 10;
     Piece[][] board = new Piece[size][size];
-    Rectangle[][] rectangles = new Rectangle[size][size];
+    JPanel[][] panels = new JPanel[size][size];
     int[][] impassableSquares = {
         {4, 2}, {4, 3}, {5, 2}, {5, 3},
         {4, 6}, {4, 7}, {5, 6}, {5, 7}
@@ -14,18 +15,27 @@ public class Board extends GridPane {
     boolean isPlayerOneTurn = true;
 
     public Board() {
-        setPrefSize(600, 600);
+        setLayout(new GridLayout(size, size));  // Use GridLayout for grid-like structure
+        setPreferredSize(new Dimension(600, 600));
+
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                Rectangle rectangle = new Rectangle(60, 60);
-                rectangle.setFill(isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE);
-                rectangle.setStroke(Color.BLACK);
-                rectangle.setOnMouseClicked(new ButtonListener(this, x, y));
-                rectangles[x][y] = rectangle;
-                add(rectangle, x, y);
+                JPanel panel = new JPanel();
+                panel.setBackground(isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE);
+                panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                // Add a mouse click listener
+                panel.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mouseClicked(java.awt.event.MouseEvent evt) {
+                        new ButtonListener(Board.this, x, y).actionPerformed(new ActionEvent(evt.getSource(), ActionEvent.ACTION_PERFORMED, null));
+                    }
+                });
+
+                panels[x][y] = panel;
+                add(panel);  // Add the panel to the layout
             }
         }
-        DefaultLayout.setupDefaultLayout(this);
+
         refreshBoard();
     }
 
@@ -65,7 +75,7 @@ public class Board extends GridPane {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 Piece piece = board[x][y];
-                rectangles[x][y].setFill(piece != null ? Color.GREEN : (isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE));
+                panels[x][y].setBackground(piece != null ? Color.GREEN : (isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE));
             }
         }
     }
@@ -73,7 +83,7 @@ public class Board extends GridPane {
     public void clearHighlights() {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                rectangles[x][y].setFill(isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE);
+                panels[x][y].setBackground(isImpassableSquare(x, y) ? Color.BLUE : Color.WHITE);
             }
         }
     }
