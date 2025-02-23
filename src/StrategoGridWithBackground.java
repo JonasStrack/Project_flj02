@@ -172,7 +172,7 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         return """
                 1. GAME BOARD AND SETUP
                 
-                1.1 Game Board
+                1.1 Game Board        
                 - Size: The board is a 10×10 grid, totaling 100 squares.
                 - Coordinates: The top-left square is (1,1), and the bottom-right square is (10,10).
                 - Lakes: There are two impassable 2×2 lake areas in the center of the board, located at:
