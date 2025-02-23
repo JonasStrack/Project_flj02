@@ -113,9 +113,18 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     }
 
     private void initializeUI() {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> showResetOptions());
-        add(resetButton, BorderLayout.SOUTH);
+        buttonPanel.add(resetButton);
+
+        JButton rulesButton = new JButton("Show Rules");
+        rulesButton.addActionListener(e -> showRulesWindow());
+        buttonPanel.add(rulesButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void showResetOptions() {
@@ -142,6 +151,83 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
             }
         }
         initializeRanksPanel(); // Reset the counts
+    }
+
+    private void showRulesWindow() {
+        JFrame rulesFrame = new JFrame("Stratego Rules");
+        JTextArea rulesTextArea = new JTextArea();
+        rulesTextArea.setText(getStrategoRules());
+        rulesTextArea.setEditable(false);
+        rulesTextArea.setLineWrap(true);
+        rulesTextArea.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(rulesTextArea);
+
+        rulesFrame.add(scrollPane);
+        rulesFrame.setSize(800, 600);
+        rulesFrame.setLocationRelativeTo(null);
+        rulesFrame.setVisible(true);
+    }
+
+    private String getStrategoRules() {
+        return """
+                1. GAME BOARD AND SETUP
+                
+                1.1 Game Board
+                - Size: The board is a 10×10 grid, totaling 100 squares.
+                - Coordinates: The top-left square is (1,1), and the bottom-right square is (10,10).
+                - Lakes: There are two impassable 2×2 lake areas in the center of the board, located at:
+                    (5,3), (5,4), (6,3), (6,4)
+                    (5,7), (5,8), (6,7), (6,8)
+                    Effect: No piece can move onto or through these tiles.
+                
+                1.2 Starting Zones
+                - Blue’s territory: The first four rows (1-4).
+                - Red’s territory: The last four rows (7-10).
+                - Neutral area: Rows 5 and 6 are initially empty.
+                
+                2. PIECES AND RANKS
+                
+                Each player has 40 pieces, each with a specific rank, strength, movement ability, and special rules.
+                The opponent cannot see the identity of a piece until combat occurs.
+                
+                2.1 Piece List
+                Rank	Count	Strength	Moves Per Turn	Special Ability
+                Marshal (★)	1	10	1 tile	None
+                General (★★)	1	9	1 tile	None
+                Colonel (★★★)	2	8	1 tile	None
+                Major (★★★★)	3	7	1 tile	None
+                Captain (★★★★★)	4	6	1 tile	None
+                Lieutenant (★★★★★★)	4	5	1 tile	None
+                Sergeant (★★★★★★★)	4	4	1 tile	None
+                Miner (★★★★★★★★)	5	3	1 tile	Can defuse bombs
+                Scout (★★★★★★★★★)	8	2	Any number of tiles in a straight line	None
+                Spy (S)	1	1	1 tile	Defeats the Marshal if attacking
+                Bomb (B)	6	-	Immovable	Defeats all attacking pieces except Miners
+                Flag (F)	1	-	Immovable	Losing this piece means losing the game
+                
+                3. GAME RULES
+                
+                3.1 Movement Rules
+                - Most pieces move one tile per turn in any orthogonal direction (up, down, left, or right).
+                - Scouts (Rank 2) can move any number of spaces in a straight line, but cannot jump over other pieces or lakes.
+                - Bombs and the Flag cannot move.
+                - Pieces cannot move diagonally.
+                
+                3.2 Combat Rules
+                - When a piece moves onto a square occupied by an enemy piece, combat occurs:
+                    - Both pieces reveal their ranks.
+                    - The higher-ranked piece wins, and the lower-ranked piece is removed.
+                    - If both pieces have the same rank, both are removed.
+                
+                Special Combat Cases:
+                - The Spy (S) defeats the Marshal (Rank 10) only if it attacks first. If the Marshal attacks the Spy, the Spy is defeated.
+                - Bombs (B) defeat all attacking pieces except Miners (Rank 3). Miners defuse bombs instead of being destroyed.
+                
+                4. WINNING CONDITIONS
+                
+                - The game ends when a player captures the opponent's Flag (F).
+                - A player also loses if they are unable to make a legal move.
+        """;
     }
 
     public StrategoTile[][] getTiles() {
