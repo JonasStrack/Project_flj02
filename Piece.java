@@ -1,24 +1,52 @@
 public class Piece {
-    String name;
-    int rank;
-    boolean movable;
-    boolean isRevealed;
-    boolean isPlayerOne;
-    int x, y;
+    private int rank;
+    private String type;
+    private int x, y;
+    private boolean isRevealed;
 
-    public Piece(String name, int rank, boolean movable, boolean isPlayerOne, int x, int y) {
-        this.name = name;
+    public Piece(int rank, String type, int x, int y) {
         this.rank = rank;
-        this.movable = movable;
-        this.isRevealed = false;
-        this.isPlayerOne = isPlayerOne;
+        this.type = type;
         this.x = x;
         this.y = y;
+        this.isRevealed = false;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public boolean isRevealed() {
+        return isRevealed;
+    }
+
+    public void setRevealed(boolean revealed) {
+        isRevealed = revealed;
+    }
+
+    public String getImagePath() {
+        return "/images/" + type.toLowerCase() + ".png";
     }
 
     @Override
     public String toString() {
-        String playerId = isPlayerOne ? "1" : "2";
-        return name + " [" + playerId + "]";
+        return "Piece{" +
+                "rank=" + rank +
+                ", type='" + type + '\'' +
+                ", position=(" + x + ", " + y + ")" +
+                ", isRevealed=" + isRevealed +
+                '}';
     }
 }

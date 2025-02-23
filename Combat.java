@@ -1,32 +1,42 @@
+import javax.swing.ImageIcon;
+
 public class Combat {
 
-    public static void resolveCombat(Board board, Piece attacker, Piece defender, int x, int y) {
-        attacker.isRevealed = true;
-        defender.isRevealed = true;
+    public static void resolveCombat(GameBoardInterface board, Piece attacker, Piece defender, int x, int y) {
+        attacker.setRevealed(true);
+        defender.setRevealed(true);
 
-        // Handle Miner vs Bomb
-        if (attacker.rank == 3 && defender.rank == 0) {
-            board.board[x][y] = attacker; // Miner defuses Bomb
-            board.board[attacker.x][attacker.y] = null;
-        } else if (defender.rank == 0) {
-            board.board[attacker.x][attacker.y] = null; // Bomb defeats attacker
-        } 
-        // Handle Spy vs Marshal
-        else if (attacker.rank == 2 && defender.rank == 10) {
-            board.board[x][y] = attacker; // Spy defeats Marshal if it attacks first
-            board.board[attacker.x][attacker.y] = null;
-        } else if (attacker.rank == defender.rank) {
-            board.board[x][y] = null; // Both pieces are removed if ranks are equal
-            board.board[attacker.x][attacker.y] = null;
-        } else if (attacker.rank > defender.rank) {
-            board.board[x][y] = attacker; // Higher rank wins
-            board.board[attacker.x][attacker.y] = null;
-        } else {
-            board.board[x][y] = defender; // Lower rank loses
-            board.board[attacker.x][attacker.y] = null;
+        // Miner vs. Bomb: Miner can defuse the bomb
+        if (attacker.getRank() == 3 && defender.getRank() == 0) {
+            System.out.println("Miner defuses the bomb!");
+            board.placePiece(x, y, new ImageIcon(attacker.getImagePath())); // Miner takes the field
+            // Remove miner from the starting field
+        }
+        // Spy vs. Marshal: Spy defeats Marshal
+        else if (attacker.getRank() == 2 && defender.getRank() == 1) {
+            System.out.println("Spy defeats Marshal!");
+            board.placePiece(x, y, new ImageIcon(attacker.getImagePath()));
+            // Remove spy from the starting field
+        }
+        // Normal combat: Higher rank wins
+        else if (attacker.getRank() > defender.getRank()) {
+            System.out.println(attacker.getType() + " defeats " + defender.getType());
+            board.placePiece(x, y, new ImageIcon(attacker.getImagePath()));
+            // Remove attacker from the starting field
+        }
+        // If ranks are equal, both pieces are removed
+        else if (attacker.getRank() == defender.getRank()) {
+            System.out.println("Draw! Both pieces are removed.");
+            // Remove both pieces from the board
+        }
+        // Defender wins if attacker has a lower rank
+        else {
+            System.out.println(defender.getType() + " defeats " + attacker.getType());
+            board.placePiece(x, y, new ImageIcon(defender.getImagePath()));
+            // Remove attacker from the starting field
         }
 
-        // After combat, update the UI board to reflect changes
-        board.refreshBoard(); // You can also use repaint() if it's not updating automatically.
+        // Refresh the board
+        ((GameBoard) board).refreshBoard();
     }
 }

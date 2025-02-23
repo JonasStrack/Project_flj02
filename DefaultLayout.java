@@ -1,93 +1,96 @@
+import javax.swing.*;
+import java.awt.Point;
+import java.awt.Image;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+
 public class DefaultLayout {
-    public static void setupDefaultLayout(Board board) {
-        // Player 1 Layout (Bottom 4 rows)
-        board.placePiece(new Piece("Flag", 0, false, true, 9, 0), 9, 0);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 1), 9, 1);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 2), 9, 2);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 3), 9, 3);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 4), 9, 4);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 5), 9, 5);
-        board.placePiece(new Piece("Bomb", 0, false, true, 9, 6), 9, 6);
-        board.placePiece(new Piece("Marshal", 10, true, true, 9, 7), 9, 7);
-        board.placePiece(new Piece("General", 9, true, true, 9, 8), 9, 8);
-        board.placePiece(new Piece("Colonel", 8, true, true, 9, 9), 9, 9);
 
-        board.placePiece(new Piece("Colonel", 8, true, true, 8, 0), 8, 0);
-        board.placePiece(new Piece("Major", 7, true, true, 8, 1), 8, 1);
-        board.placePiece(new Piece("Major", 7, true, true, 8, 2), 8, 2);
-        board.placePiece(new Piece("Major", 7, true, true, 8, 3), 8, 3);
-        board.placePiece(new Piece("Captain", 6, true, true, 8, 4), 8, 4);
-        board.placePiece(new Piece("Captain", 6, true, true, 8, 5), 8, 5);
-        board.placePiece(new Piece("Captain", 6, true, true, 8, 6), 8, 6);
-        board.placePiece(new Piece("Lieutenant", 5, true, true, 8, 7), 8, 7);
-        board.placePiece(new Piece("Lieutenant", 5, true, true, 8, 8), 8, 8);
-        board.placePiece(new Piece("Lieutenant", 5, true, true, 8, 9), 8, 9);
+    private static final int TILE_SIZE = 60;
+    private Map<Point, String> layout;
+    private GameBoardInterface gameBoard;
 
-        board.placePiece(new Piece("Lieutenant", 5, true, true, 7, 0), 7, 0);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 1), 7, 1);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 2), 7, 2);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 3), 7, 3);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 4), 7, 4);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 5), 7, 5);
-        board.placePiece(new Piece("Sergeant", 4, true, true, 7, 6), 7, 6);
-        board.placePiece(new Piece("Miner", 3, true, true, 7, 7), 7, 7);
-        board.placePiece(new Piece("Miner", 3, true, true, 7, 8), 7, 8);
-        board.placePiece(new Piece("Miner", 3, true, true, 7, 9), 7, 9);
+    public DefaultLayout(GameBoardInterface gameBoard) {
+        this.gameBoard = gameBoard;
+        layout = new HashMap<>();
+    }
 
-        board.placePiece(new Piece("Miner", 3, true, true, 6, 0), 6, 0);
-        board.placePiece(new Piece("Spy", 2, true, true, 6, 1), 6, 1);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 2), 6, 2);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 3), 6, 3);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 4), 6, 4);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 5), 6, 5);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 6), 6, 6);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 7), 6, 7);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 8), 6, 8);
-        board.placePiece(new Piece("Scout", 1, true, true, 6, 9), 6, 9);
+    public void initializeLayout() {
+        layout.put(new Point(0, 4), "/res/flag.png"); // Flag
+        layout.put(new Point(0, 3), "/res/bomb.png"); // Bomb
+        layout.put(new Point(0, 5), "/res/bomb.png"); // Bomb
+        layout.put(new Point(1, 4), "/res/miner.png"); // Miner
+        layout.put(new Point(1, 3), "/res/miner.png"); // Miner
+        layout.put(new Point(1, 5), "/res/miner.png"); // Miner
+        layout.put(new Point(1, 2), "/res/spy.png"); // Spy
+        layout.put(new Point(1, 6), "/res/scout.png"); // Scout
+        layout.put(new Point(1, 1), "/res/scout.png"); // Scout
+        layout.put(new Point(1, 7), "/res/scout.png"); // Scout
+        layout.put(new Point(1, 0), "/res/sergeant.png"); // Sergeant
+        layout.put(new Point(1, 8), "/res/sergeant.png"); // Sergeant
+        layout.put(new Point(1, 9), "/res/sergeant.png"); // Sergeant
+        layout.put(new Point(2, 4), "/res/captain.png"); // Captain
+        layout.put(new Point(2, 3), "/res/captain.png"); // Captain
+        layout.put(new Point(2, 5), "/res/captain.png"); // Captain
+        layout.put(new Point(2, 2), "/res/lieutenant.png"); // Lieutenant
+        layout.put(new Point(2, 6), "/res/lieutenant.png"); // Lieutenant
+        layout.put(new Point(2, 1), "/res/major.png"); // Major
+        layout.put(new Point(2, 7), "/res/major.png"); // Major
+        layout.put(new Point(2, 0), "/res/colonel.png"); // Colonel
+        layout.put(new Point(2, 8), "/res/colonel.png"); // Colonel
+        layout.put(new Point(3, 4), "/res/general.png"); // General
+        layout.put(new Point(3, 3), "/res/marshal.png"); // Marshal
+        layout.put(new Point(3, 5), "/res/scout.png"); // Scout
+        layout.put(new Point(3, 2), "/res/scout.png"); // Scout
+        layout.put(new Point(3, 6), "/res/scout.png"); // Scout
+        layout.put(new Point(3, 1), "/res/miner.png"); // Miner
+        layout.put(new Point(3, 7), "/res/miner.png"); // Miner
+        layout.put(new Point(3, 0), "/res/sergeant.png"); // Sergeant
+        layout.put(new Point(3, 8), "/res/sergeant.png"); // Sergeant
+        layout.put(new Point(0, 0), "/res/scout.png"); // Scout
+        layout.put(new Point(0, 9), "/res/scout.png"); // Scout
+        layout.put(new Point(1, 9), "/res/scout.png"); // Scout
+        layout.put(new Point(2, 9), "/res/scout.png"); // Scout
+        layout.put(new Point(3, 9), "/res/scout.png"); // Scout
 
-        // Player 2 Layout (Top 4 rows)
-        board.placePiece(new Piece("Flag", 0, false, false, 0, 0), 0, 0);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 1), 0, 1);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 2), 0, 2);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 3), 0, 3);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 4), 0, 4);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 5), 0, 5);
-        board.placePiece(new Piece("Bomb", 0, false, false, 0, 6), 0, 6);
-        board.placePiece(new Piece("Marshal", 10, true, false, 0, 7), 0, 7);
-        board.placePiece(new Piece("General", 9, true, false, 0, 8), 0, 8);
-        board.placePiece(new Piece("Colonel", 8, true, false, 0, 9), 0, 9);
+        for (Map.Entry<Point, String> entry : layout.entrySet()) {
+            Point position = entry.getKey();
+            String path = entry.getValue();
+            java.net.URL resource = getClass().getResource(path);
+            if (resource == null) {
+                System.err.println("Resource not found: " + path);
+                continue;
+            }
+            ImageIcon icon = new ImageIcon(resource);
+            if (icon.getImage() == null) {
+                System.err.println("Error loading image: " + path);
+            } else {
+                ImageIcon scaledIcon = scaleImage(resource, TILE_SIZE, TILE_SIZE);
+                if (scaledIcon != null) {
+                    gameBoard.placePiece(position.x, position.y, scaledIcon);
+                } else {
+                    System.err.println("Failed to place piece at (" + position.x + ", " + position.y + "): scaled image is null");
+                }
+            }
+        }
+    }
 
-        board.placePiece(new Piece("Colonel", 8, true, false, 1, 0), 1, 0);
-        board.placePiece(new Piece("Major", 7, true, false, 1, 1), 1, 1);
-        board.placePiece(new Piece("Major", 7, true, false, 1, 2), 1, 2);
-        board.placePiece(new Piece("Major", 7, true, false, 1, 3), 1, 3);
-        board.placePiece(new Piece("Captain", 6, true, false, 1, 4), 1, 4);
-        board.placePiece(new Piece("Captain", 6, true, false, 1, 5), 1, 5);
-        board.placePiece(new Piece("Captain", 6, true, false, 1, 6), 1, 6);
-        board.placePiece(new Piece("Lieutenant", 5, true, false, 1, 7), 1, 7);
-        board.placePiece(new Piece("Lieutenant", 5, true, false, 1, 8), 1, 8);
-        board.placePiece(new Piece("Lieutenant", 5, true, false, 1, 9), 1, 9);
-
-        board.placePiece(new Piece("Lieutenant", 5, true, false, 2, 0), 2, 0);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 1), 2, 1);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 2), 2, 2);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 3), 2, 3);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 4), 2, 4);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 5), 2, 5);
-        board.placePiece(new Piece("Sergeant", 4, true, false, 2, 6), 2, 6);
-        board.placePiece(new Piece("Miner", 3, true, false, 2, 7), 2, 7);
-        board.placePiece(new Piece("Miner", 3, true, false, 2, 8), 2, 8);
-        board.placePiece(new Piece("Miner", 3, true, false, 2, 9), 2, 9);
-
-        board.placePiece(new Piece("Miner", 3, true, false, 3, 0), 3, 0);
-        board.placePiece(new Piece("Spy", 2, true, false, 3, 1), 3, 1);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 2), 3, 2);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 3), 3, 3);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 4), 3, 4);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 5), 3, 5);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 6), 3, 6);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 7), 3, 7);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 8), 3, 8);
-        board.placePiece(new Piece("Scout", 1, true, false, 3, 9), 3, 9);
+    private ImageIcon scaleImage(java.net.URL resource, int width, int height) {
+        try {
+            BufferedImage image = ImageIO.read(resource);
+            if (image == null) {
+                System.err.println("Image not found: " + resource);
+                return null;
+            }
+            Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledImage);
+        } catch (IOException e) {
+            System.err.println("Error loading image: " + resource);
+            e.printStackTrace();
+            return null;
+        }
     }
 }
