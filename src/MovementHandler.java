@@ -26,18 +26,19 @@ public class MovementHandler {
         }
     }
 
-    private void handleTileClick(StrategoTile tile) {
+    public void handleTileClick(StrategoTile tile) {
         if (selectedTile == null && tile.getFigure() != null) {
             selectedTile = tile;
-            selectedIcon = (ImageIcon) ((JLabel) tile.getComponent(0)).getIcon();
+            selectedIcon = tile.getFigure();
             selectedPiece = gameBoard.getPieceAtTile(selectedTile);  // Get the piece
+            ((StrategoGridWithBackground) gameBoard).updateStatusBar("Piece selected.");
             return;
         }
         if (selectedTile != null && tile != selectedTile) {
             if (isMoveAllowed(selectedTile, tile)) {
                 movePiece(tile);
             } else {
-                System.out.println("Invalid move!");
+                ((StrategoGridWithBackground) gameBoard).updateStatusBar("Invalid move!");
             }
         }
     }
@@ -52,7 +53,7 @@ public class MovementHandler {
         if (selectedPiece == null) return false;
 
         // Example: Allow movement to adjacent tiles
-        if (Math.abs(startRow - targetRow) <= 1 && Math.abs(startCol - targetCol) <= 1) {
+        if (Math.abs(startRow - targetRow) + Math.abs(startCol - targetCol) == 1) {
             return true;  // Movement to adjacent tiles allowed
         }
         return false;
@@ -71,10 +72,6 @@ public class MovementHandler {
         selectedTile = null;
         selectedPiece = null;
 
-        // Check if combat occurs
-        Piece targetPiece = gameBoard.getPieceAtTile(targetTile);
-        if (targetPiece != null) {
-            Combat.resolveCombat(gameBoard, selectedPiece, targetPiece, gameBoard.getTileRow(targetTile), gameBoard.getTileCol(targetTile));
-        }
+        ((StrategoGridWithBackground) gameBoard).updateStatusBar("Move successful. Next player's turn.");
     }
 }

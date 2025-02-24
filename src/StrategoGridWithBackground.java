@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -18,10 +20,15 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     private static final int EXTRA_HEIGHT = 150; // Extra height for the window
     private StrategoTile[][] tiles;
     private DefaultLayout defaultLayout;
+    private DefaultLayout[] defaultLayouts; // Array to hold multiple default layouts
     private JPanel ranksPanel;
     private ImageIcon selectedFigure = null;
     private Map<String, Integer> figureCounts;
     private Map<String, JLabel> countLabels;
+    private boolean isPlayerOneTurn = true; // Track turn
+    private boolean gameStarted = false; // Track if the game has started
+    private JLabel statusBar; // Status bar at the bottom
+    private MovementHandler movementHandler;
 
     public StrategoGridWithBackground() {
         setLayout(new BorderLayout());
@@ -49,8 +56,11 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
         add(boardPanel, BorderLayout.CENTER);
 
+        // Initialize default layouts
+        initializeDefaultLayouts();
+
         // Load default layout
-        defaultLayout = new DefaultLayout(this);
+        defaultLayout = defaultLayouts[0]; // Load the first default layout by default
         defaultLayout.initializeLayout();
 
         // Initialize ranks panel
@@ -58,6 +68,12 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
         // Initialize UI
         initializeUI();
+
+        // Initialize movement handler
+        movementHandler = new MovementHandler(this);
+
+        // Initialize status bar
+        statusBar = new JLabel("Welcome to Stratego!");
     }
 
     private void initializeRanksPanel() {
@@ -120,23 +136,51 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         resetButton.addActionListener(e -> showResetOptions());
         buttonPanel.add(resetButton);
 
+        JButton startGameButton = new JButton("Start Game");
+        startGameButton.addActionListener(e -> startGame());
+        buttonPanel.add(startGameButton);
+
         JButton rulesButton = new JButton("Show Rules");
         rulesButton.addActionListener(e -> showRulesWindow());
         buttonPanel.add(rulesButton);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(buttonPanel, BorderLayout.NORTH);
+        bottomPanel.add(statusBar, BorderLayout.SOUTH);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private void startGame() {
+        gameStarted = true;
+        for (JLabel countLabel : countLabels.values()) {
+            countLabel.setVisible(false);
+        }
+        statusBar.setText("Game started. Player 1's turn.");
     }
 
     private void showResetOptions() {
+        String[] options = {"Default Layout 1", "Default Layout 2", "Default Layout 3", "Custom Placement"};
         int option = JOptionPane.showOptionDialog(this, "Choose reset option:", "Reset",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-                new String[]{"Default Layout", "Custom Placement"}, "Default Layout");
+                options, options[0]);
 
-        if (option == 0) {
+        if (option >= 0 && option < defaultLayouts.length) {
+            defaultLayout = defaultLayouts[option];
             resetBoard();
-        } else if (option == 1) {
+            updateCountersToZero();
+            statusBar.setText("Board reset to " + options[option]);
+        } else if (option == defaultLayouts.length) {
             clearBoard();
+            statusBar.setText("Board cleared for custom placement.");
         }
+    }
+
+    private void initializeDefaultLayouts() {
+        defaultLayouts = new DefaultLayout[3];
+        defaultLayouts[0] = new DefaultLayout1(this);
+        defaultLayouts[1] = new DefaultLayout2(this);
+        defaultLayouts[2] = new DefaultLayout3(this);
     }
 
     private void resetBoard() {
@@ -154,80 +198,8 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     }
 
     private void showRulesWindow() {
-        JFrame rulesFrame = new JFrame("Stratego Rules");
-        JTextArea rulesTextArea = new JTextArea();
-        rulesTextArea.setText(getStrategoRules());
-        rulesTextArea.setEditable(false);
-        rulesTextArea.setLineWrap(true);
-        rulesTextArea.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(rulesTextArea);
-
-        rulesFrame.add(scrollPane);
-        rulesFrame.setSize(800, 600);
-        rulesFrame.setLocationRelativeTo(null);
-        rulesFrame.setVisible(true);
-    }
-
-    private String getStrategoRules() {
-        return """
-                1. GAME BOARD AND SETUP
-                
-                1.1 Game Board        
-                - Size: The board is a 10×10 grid, totaling 100 squares.
-                - Coordinates: The top-left square is (1,1), and the bottom-right square is (10,10).
-                - Lakes: There are two impassable 2×2 lake areas in the center of the board, located at:
-                    (5,3), (5,4), (6,3), (6,4)
-                    (5,7), (5,8), (6,7), (6,8)
-                    Effect: No piece can move onto or through these tiles.
-                
-                1.2 Starting Zones
-                - Blue’s territory: The first four rows (1-4).
-                - Red’s territory: The last four rows (7-10).
-                - Neutral area: Rows 5 and 6 are initially empty.
-                
-                2. PIECES AND RANKS
-                
-                Each player has 40 pieces, each with a specific rank, strength, movement ability, and special rules.
-                The opponent cannot see the identity of a piece until combat occurs.
-                
-                2.1 Piece List
-                Rank	Count	Strength	Moves Per Turn	Special Ability
-                Marshal (★)	1	10	1 tile	None
-                General (★★)	1	9	1 tile	None
-                Colonel (★★★)	2	8	1 tile	None
-                Major (★★★★)	3	7	1 tile	None
-                Captain (★★★★★)	4	6	1 tile	None
-                Lieutenant (★★★★★★)	4	5	1 tile	None
-                Sergeant (★★★★★★★)	4	4	1 tile	None
-                Miner (★★★★★★★★)	5	3	1 tile	Can defuse bombs
-                Scout (★★★★★★★★★)	8	2	Any number of tiles in a straight line	None
-                Spy (S)	1	1	1 tile	Defeats the Marshal if attacking
-                Bomb (B)	6	-	Immovable	Defeats all attacking pieces except Miners
-                Flag (F)	1	-	Immovable	Losing this piece means losing the game
-                
-                3. GAME RULES
-                
-                3.1 Movement Rules
-                - Most pieces move one tile per turn in any orthogonal direction (up, down, left, or right).
-                - Scouts (Rank 2) can move any number of spaces in a straight line, but cannot jump over other pieces or lakes.
-                - Bombs and the Flag cannot move.
-                - Pieces cannot move diagonally.
-                
-                3.2 Combat Rules
-                - When a piece moves onto a square occupied by an enemy piece, combat occurs:
-                    - Both pieces reveal their ranks.
-                    - The higher-ranked piece wins, and the lower-ranked piece is removed.
-                    - If both pieces have the same rank, both are removed.
-                
-                Special Combat Cases:
-                - The Spy (S) defeats the Marshal (Rank 10) only if it attacks first. If the Marshal attacks the Spy, the Spy is defeated.
-                - Bombs (B) defeat all attacking pieces except Miners (Rank 3). Miners defuse bombs instead of being destroyed.
-                
-                4. WINNING CONDITIONS
-                
-                - The game ends when a player captures the opponent's Flag (F).
-                - A player also loses if they are unable to make a legal move.
-        """;
+        RulesWindow rulesWindow = new RulesWindow();
+        rulesWindow.setVisible(true);
     }
 
     public StrategoTile[][] getTiles() {
@@ -283,7 +255,7 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     @Override
     public void refreshBoard() {
         for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+            for (int col = 0; row < GRID_SIZE; col++) {
                 tiles[row][col].revalidate();
                 tiles[row][col].repaint();
             }
@@ -325,6 +297,13 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         }
     }
 
+    private void updateCountersToZero() {
+        for (String path : countLabels.keySet()) {
+            figureCounts.put(path, 0);
+            countLabels.get(path).setText("0");
+        }
+    }
+
     private class TileClickListener extends MouseAdapter {
         private final int row;
         private final int col;
@@ -336,15 +315,13 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (selectedFigure != null) {
-                if (figureCounts.get(selectedFigure.getDescription()) > 0) {
+            if (!gameStarted) {
+                if (selectedFigure != null) {
                     placePiece(row, col, selectedFigure);
-                    figureCounts.put(selectedFigure.getDescription(), figureCounts.get(selectedFigure.getDescription()) - 1);
-                    updateCountLabel(selectedFigure.getDescription());
                     selectedFigure = null;
-                } else {
-                    JOptionPane.showMessageDialog(null, "No more pieces of this type left to place.");
                 }
+            } else {
+                movementHandler.handleTileClick(tiles[row - 1][col - 1]);
             }
         }
     }
@@ -358,13 +335,22 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            selectedFigure = new ImageIcon(getClass().getResource(imagePath));
-            selectedFigure.setDescription(imagePath); // Store the path in the description for easy reference
+            if (!gameStarted) {
+                selectedFigure = new ImageIcon(getClass().getResource(imagePath));
+                selectedFigure.setDescription(imagePath); // Store the path in the description for easy reference
+            }
         }
     }
 
     private void updateCountLabel(String imagePath) {
-        countLabels.get(imagePath).setText(String.valueOf(figureCounts.get(imagePath)));
+        Integer count = figureCounts.get(imagePath);
+        if (count != null) {
+            countLabels.get(imagePath).setText(String.valueOf(count));
+        }
+    }
+
+    public void updateStatusBar(String message) {
+        statusBar.setText(message);
     }
 
     public static void main(String[] args) {

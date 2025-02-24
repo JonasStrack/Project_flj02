@@ -1,5 +1,5 @@
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
 
 public class StrategoTile extends JPanel {
     private ImageIcon figure;
