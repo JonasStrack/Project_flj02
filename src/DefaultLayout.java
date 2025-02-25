@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 public class DefaultLayout {
 
     private static final int TILE_SIZE = 60;
+    private static final int GRID_SIZE = 10; // Assuming a 10x10 grid
     private Map<Point, String> layout;
     private GameBoardInterface gameBoard;
     private String layoutFilePath;
@@ -40,7 +41,12 @@ public class DefaultLayout {
             } else {
                 ImageIcon scaledIcon = scaleImage(resource, TILE_SIZE, TILE_SIZE);
                 if (scaledIcon != null) {
+                    // Place piece for Player One
                     gameBoard.placePiece(position.x, position.y, scaledIcon);
+                    // Place mirrored piece for Player Two
+                    int mirroredX = GRID_SIZE - position.x + 1;
+                    int mirroredY = GRID_SIZE - position.y + 1;
+                    gameBoard.placePiece(mirroredX, mirroredY, scaledIcon);
                 } else {
                     System.err.println("Failed to place piece at (" + position.x + ", " + position.y + "): scaled image is null");
                 }

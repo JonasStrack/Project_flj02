@@ -73,5 +73,6 @@ public class MovementHandler {
         selectedPiece = null;
 
         ((StrategoGridWithBackground) gameBoard).updateStatusBar("Move successful. Next player's turn.");
+        ((StrategoGridWithBackground) gameBoard).switchTurn();
     }
 }

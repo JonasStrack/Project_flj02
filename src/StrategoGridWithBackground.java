@@ -66,6 +66,9 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         // Initialize ranks panel
         initializeRanksPanel();
 
+        // Initialize UI
+        initializeUI();
+
         // Initialize movement handler
         movementHandler = new MovementHandler(this);
 
@@ -73,10 +76,9 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         statusBar = new JLabel("Welcome to Stratego!");
         if (statusBar == null) {
             System.err.println("Constructor: statusBar is null after initialization");
+        } else {
+            add(statusBar, BorderLayout.SOUTH);
         }
-
-        // Initialize UI
-        initializeUI();
     }
 
     private void initializeRanksPanel() {
@@ -108,7 +110,8 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
             rankLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
             ImageIcon rankIcon = new ImageIcon(getClass().getResource(imagePaths[i]));
-            JLabel rankImageLabel = new JLabel(scaleImage(imagePaths[i], RANK_IMAGE_SIZE, RANK_IMAGE_SIZE));
+            rankIcon.setDescription(i + "_" + ranks[i]); // Set description with index and rank
+            JLabel rankImageLabel = new JLabel(scaleImage(rankIcon, RANK_IMAGE_SIZE, RANK_IMAGE_SIZE));
             rankImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
             rankImageLabel.addMouseListener(new RankClickListener(imagePaths[i]));
 
@@ -152,8 +155,18 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         buttonPanel.add(rulesButton);
         System.out.println("initializeUI: Added rulesButton");
 
+        JButton confirmLayoutButton = new JButton("Confirm Layout");
+        confirmLayoutButton.addActionListener(e -> confirmLayout());
+        buttonPanel.add(confirmLayoutButton);
+        System.out.println("initializeUI: Added confirmLayoutButton for player two");
+
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.add(buttonPanel, BorderLayout.NORTH);
+
+        // Check if statusBar is initialized
+        if (statusBar == null) {
+            statusBar = new JLabel("Welcome to Stratego!");
+        }
         bottomPanel.add(statusBar, BorderLayout.SOUTH);
         System.out.println("initializeUI: Created bottomPanel and added components");
 
@@ -178,6 +191,16 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         System.out.println("initializeUI: Finished initialization");
     }
 
+    private void confirmLayout() {
+        // Logic to confirm player two layout and start the game
+        gameStarted = true;
+        for (JLabel countLabel : countLabels.values()) {
+            countLabel.setVisible(false);
+        }
+        statusBar.setText("Game started. Player 1's turn.");
+        isPlayerOneTurn = true; // Ensure Player 1 starts the game
+    }
+
     private void startGame() {
         gameStarted = true;
         for (JLabel countLabel : countLabels.values()) {
@@ -187,6 +210,11 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     }
 
     private void showResetOptions() {
+        if (gameStarted) {
+            statusBar.setText("Cannot reset layout after game has started.");
+            return;
+        }
+
         String[] options = {"Default Layout 1", "Default Layout 2", "Default Layout 3", "Custom Placement"};
         int option = JOptionPane.showOptionDialog(this, "Choose reset option:", "Reset",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
@@ -205,9 +233,9 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
     private void initializeDefaultLayouts() {
         defaultLayouts = new DefaultLayout[3];
-        defaultLayouts[0] = new DefaultLayout1(this);
-        defaultLayouts[1] = new DefaultLayout2(this);
-        defaultLayouts[2] = new DefaultLayout3(this);
+        defaultLayouts[0] = new DefaultLayout(this, "src/layouts/default_layout1.txt");
+        defaultLayouts[1] = new DefaultLayout(this, "src/layouts/default_layout2.txt");
+        defaultLayouts[2] = new DefaultLayout(this, "src/layouts/default_layout3.txt");
     }
 
     private void resetBoard() {
@@ -235,11 +263,7 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
     @Override
     public Piece getPieceAtTile(StrategoTile tile) {
-        int row = getTileRow(tile);
-        int col = getTileCol(tile);
-        // Return the piece at the given tile
-        // This implementation is a placeholder; you need to adapt it to your game logic
-        return null;
+        return tile.getPiece();
     }
 
     @Override
@@ -270,6 +294,8 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     public void placePiece(int row, int col, ImageIcon icon) {
         if (row >= 1 && row <= GRID_SIZE && col >= 1 && col <= GRID_SIZE) {
             if (icon != null) {
+                String description = row + "_" + col;
+                icon.setDescription(description); // Set the description to store the rank and type
                 tiles[row - 1][col - 1].setFigure(scaleImage(icon, BOARD_IMAGE_SIZE, BOARD_IMAGE_SIZE));
             } else {
                 System.err.println("Failed to place piece at (" + row + ", " + col + "): image icon is null");
@@ -282,7 +308,7 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     @Override
     public void refreshBoard() {
         for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; row < GRID_SIZE; col++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
                 tiles[row][col].revalidate();
                 tiles[row][col].repaint();
             }
@@ -378,6 +404,11 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
 
     public void updateStatusBar(String message) {
         statusBar.setText(message);
+    }
+
+    public void switchTurn() {
+        isPlayerOneTurn = !isPlayerOneTurn;
+        updateStatusBar(isPlayerOneTurn ? "Player 1's turn." : "Player 2's turn.");
     }
 
     public static void main(String[] args) {
