@@ -66,14 +66,17 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
         // Initialize ranks panel
         initializeRanksPanel();
 
-        // Initialize UI
-        initializeUI();
-
         // Initialize movement handler
         movementHandler = new MovementHandler(this);
 
         // Initialize status bar
         statusBar = new JLabel("Welcome to Stratego!");
+        if (statusBar == null) {
+            System.err.println("Constructor: statusBar is null after initialization");
+        }
+
+        // Initialize UI
+        initializeUI();
     }
 
     private void initializeRanksPanel() {
@@ -129,26 +132,50 @@ public class StrategoGridWithBackground extends JFrame implements GameBoardInter
     }
 
     private void initializeUI() {
+        System.out.println("initializeUI: Starting initialization");
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> showResetOptions());
         buttonPanel.add(resetButton);
+        System.out.println("initializeUI: Added resetButton");
 
         JButton startGameButton = new JButton("Start Game");
         startGameButton.addActionListener(e -> startGame());
         buttonPanel.add(startGameButton);
+        System.out.println("initializeUI: Added startGameButton");
 
         JButton rulesButton = new JButton("Show Rules");
         rulesButton.addActionListener(e -> showRulesWindow());
         buttonPanel.add(rulesButton);
+        System.out.println("initializeUI: Added rulesButton");
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.add(buttonPanel, BorderLayout.NORTH);
         bottomPanel.add(statusBar, BorderLayout.SOUTH);
+        System.out.println("initializeUI: Created bottomPanel and added components");
 
-        add(bottomPanel, BorderLayout.SOUTH);
+        // Log and check for null components before adding to the container
+        if (buttonPanel == null) {
+            System.err.println("initializeUI: buttonPanel is null");
+        }
+        if (statusBar == null) {
+            System.err.println("initializeUI: statusBar is null");
+        }
+        if (bottomPanel == null) {
+            System.err.println("initializeUI: bottomPanel is null");
+        }
+
+        if (buttonPanel != null && statusBar != null && bottomPanel != null) {
+            add(bottomPanel, BorderLayout.SOUTH);
+            System.out.println("initializeUI: Added bottomPanel to the container");
+        } else {
+            System.err.println("initializeUI: One or more components are null, cannot add to the container");
+        }
+
+        System.out.println("initializeUI: Finished initialization");
     }
 
     private void startGame() {
