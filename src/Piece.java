@@ -1,52 +1,48 @@
 public class Piece {
-    private int rank;
-    private String type;
-    private int x, y;
-    private boolean isRevealed;
+    public enum Rank {
+        MARSHAL(10, true),
+        GENERAL(9, true),
+        COLONEL(8, true),
+        MAJOR(7, true),
+        CAPTAIN(6, true),
+        LIEUTENANT(5, true),
+        SERGEANT(4, true),
+        MINER(3, true),
+        SCOUT(2, true),
+        SPY(1, true),
+        BOMB(0, false),
+        FLAG(0, false);
 
-    public Piece(int rank, String type, int x, int y) {
+        public final int value;
+        public final boolean movable;
+
+        Rank(int value, boolean movable) {
+            this.value = value;
+            this.movable = movable;
+        }
+    }
+
+    private String owner; // "Red" or "Blue"
+    private Rank rank;
+    private int row, col;
+    private boolean revealedToOpponent = false;
+
+    public Piece(String owner, Rank rank) {
+        this.owner = owner;
         this.rank = rank;
-        this.type = type;
-        this.x = x;
-        this.y = y;
-        this.isRevealed = false;
     }
 
-    public int getRank() {
-        return rank;
+    public Rank getRank() { return rank; }
+    public int getRankValue() { return rank.value; }
+    public boolean isMovable() { return rank.movable; }
+    public String getOwner() { return owner; }
+    public int getRow() { return row; }
+    public int getCol() { return col; }
+    public void setPosition(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
-
-    public String getType() {
-        return type;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public boolean isRevealed() {
-        return isRevealed;
-    }
-
-    public void setRevealed(boolean revealed) {
-        isRevealed = revealed;
-    }
-
-    public String getImagePath() {
-        return "/images/" + type.toLowerCase() + ".png";
-    }
-
-    @Override
-    public String toString() {
-        return "Piece{" +
-                "rank=" + rank +
-                ", type='" + type + '\'' +
-                ", position=(" + x + ", " + y + ")" +
-                ", isRevealed=" + isRevealed +
-                '}';
-    }
+    public boolean isRevealedToOpponent() { return revealedToOpponent; }
+    public void reveal() { revealedToOpponent = true; }
+    public String getTypeName() { return rank.name(); }
 }
